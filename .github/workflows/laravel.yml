@@ -1,60 +1,35 @@
-name: CI
+name: laravel
+
 on:
-  pull_request:
-    branches:
-      - main
   push:
-    branches:
-      - main
+    branches: [ "production" ]
+  pull_request:
+    branches: [ "production" ]
 
 jobs:
-  tests:
+  laravel-tests:
+
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: e-shop
-        ports:
-          - 3307:3307
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
     steps:
-    - uses: actions/checkout@v2
+    - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
       with:
-        fetch-depth: 1
-
-    - name: Cache composer dependencies
-      uses: actions/cache@v2
-      with:
-        path: vendor
-        key: composer-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          composer-
-
-    - name: Install PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: 8.1
-
-    - name: Install composer dependencies
+        php-version: '8.2'
+    - uses: actions/checkout@v3
+    - name: Copy .env
+      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+    - name: Install Dependencies
+      run: composer install --ignore-platform-reqs -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+    - name: Directory Permissions
+      run: mkdir bootstrap/cache && chmod -R 777 storage bootstrap/cache
+    - name: Generate key
+      run: php artisan key:generate
+    - name: Create Database
       run: |
-        composer install --no-scripts
-
-    - name: Prepare Laravel Application
-      run: |
-        cp .env.example .env
-        php artisan key:generate
-
-    - name: Run Test suite
-      run: |
-        php artisan cache:clear
-        php artisan test
-
-    - name: Install NPM dependencies
-      run: npm install
-
-    - name: Compile assets
-      run: npm run build
+        mkdir -p database
+        touch database/database.sqlite
+    - name: Execute tests (Unit and Feature tests) via PHPUnit
+      env:
+        DB_CONNECTION: mysql
+        DB_DATABASE: database/database.mysql
+      run: vendor/bin/phpunit
