@@ -49,7 +49,9 @@ jobs:
         php artisan key:generate
 
     - name: Run Test suite
-      run: php artisan test
+      run: |
+        php artisan cache:clear
+        php artisan test
 
     - name: Install NPM dependencies
       run: npm install
