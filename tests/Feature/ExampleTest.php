@@ -1,6 +1,7 @@
 <?php
 
 namespace Tests\Feature;
+use DatabaseMigrations;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
