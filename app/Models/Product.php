@@ -6,7 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Cart;
 class Product extends Model
 {
-    protected $products = 'Product';
+    use HasFactory;
+    protected $table = 'Product';
     protected $fillable=['title','slug','summary','description','cat_id','child_cat_id','price','brand_id','discount','status','photo','quantity','unit','stock','is_featured','condition'];
 
     public function cat_info(){
