@@ -8,5 +8,3 @@ composer.lock
 Homestead.yaml
 npm-debug.log
 yarn-error.log
-
-.vercel
