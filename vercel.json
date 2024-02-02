@@ -13,6 +13,10 @@
             "src": "/api/(.*)",
             "dest": "/api/index.php"
         }
+         {
+            "src": "/(.*)",
+            "dest": "/public/$1"
+        }
     ],
     "env": {
         "APP_CONFIG_CACHE": "/tmp/config.php",
